@@ -2,11 +2,17 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('editing') {
             steps {
-                git branch: 'master',
-                    credentialsId: 'gitPass',
-                    url: 'https://github.com/GaneshSaravanan007/ShellScripts.git'
+                script{
+                  sh '''
+                      SHA=$(curl -s \
+https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
+| jq -r .sha)
+echo $SHA
+
+                    '''
+                }
             }
         }
     }
