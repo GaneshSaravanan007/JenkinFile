@@ -6,16 +6,16 @@ pipeline {
             steps {
                
                   sh '''
-                     curl -s https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
+                    curl -s https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
                       | jq -r .content | base64 --decode > hello.txt
                       cat hello.txt
                       SHA=$(curl -s https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt | jq -r .sha)
                      echo $SHA
-                     echo "hello from pipeline 2" >> hello.txt
+                     echo "hello from pipeline 3" >> hello.txt
                      pwd
                      cat hello.txt
                    CONTENT=$(base64 hello.txt | tr -d '\n')
-                  curl -X PUT -H "Authorization: Bearer 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" -H "Content-Type: application/json" https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
+                  curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
                  -d "{
                       \"message\": \"Update hello.txt via curl\",
                       \"content\": \"$CONTENT\",
