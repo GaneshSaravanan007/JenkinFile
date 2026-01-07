@@ -8,8 +8,8 @@ pipeline {
                   sh '''
                       SHA=$(curl -s https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt | jq -r .sha)
                      echo $SHA
-                     cat > Jenkinsfile <<EOF
-                       ${params.adding_line}
+                     cat > hello.txt <<EOF
+                       hello from pipeline
                       EOF
 
                    CONTENT=$(base64 hello.txt | tr -d '\n')
