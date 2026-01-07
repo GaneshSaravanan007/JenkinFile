@@ -11,12 +11,11 @@ pipeline {
                       cat hello.txt
                       SHA=$(curl -s https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt | jq -r .sha)
                      echo $SHA
-                     echo "$adding_line" >> hello.txt
+                     echo "hello from pipeline 1" >> hello.txt
                      pwd
                      cat hello.txt
-                     echo "$TOKEN"
                    CONTENT=$(base64 hello.txt | tr -d '\n')
-                   curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
+                  curl -X PUT -H "Authorization: Bearer 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" -H "Content-Type: application/json" https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
                  -d "{
                       \"message\": \"Update hello.txt via curl\",
                       \"content\": \"$CONTENT\",
