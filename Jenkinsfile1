@@ -10,6 +10,21 @@ pipeline {
 https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
 | jq -r .sha)
 echo $SHA
+cat > Jenkinsfile <<EOF
+${params.adding_line}
+EOF
+
+CONTENT=$(base64 hello.txt | tr -d '\n')
+curl -X PUT \
+  -H "Authorization: Bearer $params.TOKEN" \
+  -H "Content-Type: application/json" \
+  https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
+  -d "{
+        \"message\": \"Update hello.txt via curl\",
+        \"content\": \"$CONTENT\",
+        \"sha\": \"$SHA\"
+      }"
+
 
                     '''
                 }
