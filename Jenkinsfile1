@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('editing') {
             steps {
-                script{
+                
                   sh '''
                       SHA=$(curl -s \
 https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
@@ -27,7 +27,7 @@ curl -X PUT \
 
 
                     '''
-                }
+                
             }
         }
     }
