@@ -5,13 +5,14 @@ pipeline {
         stage('editing') {
             steps {
                script{
+                 def aa=params.adding_line
                   sh '''
                     curl -s https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt \
                       | jq -r .content | base64 --decode > hello.txt
                       cat hello.txt
                       SHA=$(curl -s https://api.github.com/repos/GaneshSaravanan007/JenkinFile/contents/hello.txt | jq -r .sha)
                      echo $SHA
-                     echo "${params.adding_line}" >> hello.txt
+                     echo "${aa}" >> hello.txt
                      pwd
                      cat hello.txt
                    CONTENT=$(base64 hello.txt | tr -d '\n')
