@@ -3,12 +3,30 @@ pipeline {
 
     stages {
 
+        stage("Checkout Repos") {
+            steps {
+
+                dir(params.DockerFileDir) {
+                    git branch: 'master',
+                        credentialsId: 'gitPass',
+                        url: 'https://github.com/GaneshSaravanan007/Docker-Project.git'
+                }
+
+                dir(params.KubernetesFileDirectory) {
+                    git branch: 'main',
+                        credentialsId: 'gitPass',
+                        url: 'https://github.com/GaneshSaravanan007/KubernetsYaml.git'
+                }
+
+                sh 'ls -lrt'
+            }
+        }
+
         stage("building image") {
             steps {
                 sh '''
-                pwd
-                ls -lrt
-                docker build -t "$imageName" `pwd`
+                cd "$WORKSPACE/$DockerFileDir"
+                docker build -t "$imageName" .
                 docker images
                 '''
             }
@@ -22,7 +40,7 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
                     sh '''
-                    cd "$DockerFileDir"
+                    cd "$WORKSPACE/$DockerFileDir"
                     echo "$PASS" | docker login -u "$USER" --password-stdin
                     docker tag "$imageName" "$USER/$repoName:$imageName"
                     docker push "$USER/$repoName:$imageName"
@@ -34,8 +52,7 @@ pipeline {
         stage("K8s Dry Run Validation") {
             steps {
                 sh '''
-                cd "$KubernetesFileDirectory"
-                echo "Running Kubernetes dry run..."
+                cd "$WORKSPACE/$KubernetesFileDirectory"
                 echo "$rootPass" | sudo -S kubectl apply -f "$yamlFile" --dry-run=server
                 '''
             }
@@ -44,13 +61,11 @@ pipeline {
         stage("Deploy to Kubernetes") {
             steps {
                 sh '''
-                cd "$KubernetesFileDirectory"
-                echo "Deploying to Kubernetes..."
+                cd "$WORKSPACE/$KubernetesFileDirectory"
                 echo "$rootPass" | sudo -S kubectl apply -f "$yamlFile"
                 echo "$rootPass" | sudo -S kubectl get all
                 '''
             }
         }
-
     }
 }
