@@ -13,7 +13,7 @@ pipeline {
                 }
 
                 dir(params.KubernetesFileDirectory) {
-                    git branch: 'main',
+                    git branch: 'master',
                         credentialsId: 'gitPass',
                         url: 'https://github.com/GaneshSaravanan007/KubernetsYaml.git'
                 }
