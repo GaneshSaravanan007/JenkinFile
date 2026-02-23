@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage("building image") {
+            steps {
+                sh '''
+                pwd
+                ls -lrt
+                docker build -t "$imageName" `pwd`
+                docker images
+                '''
+            }
+        }
+
+        stage("pushing image to docker hub") {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'DockerHub',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh '''
+                    cd "$DockerFileDir"
+                    echo "$PASS" | docker login -u "$USER" --password-stdin
+                    docker tag "$imageName" "$USER/$repoName:$imageName"
+                    docker push "$USER/$repoName:$imageName"
+                    '''
+                }
+            }
+        }
+
+        stage("K8s Dry Run Validation") {
+            steps {
+                sh '''
+                cd "$KubernetesFileDirectory"
+                echo "Running Kubernetes dry run..."
+                echo "$rootPass" | sudo -S kubectl apply -f "$yamlFile" --dry-run=server
+                '''
+            }
+        }
+
+        stage("Deploy to Kubernetes") {
+            steps {
+                sh '''
+                cd "$KubernetesFileDirectory"
+                echo "Deploying to Kubernetes..."
+                echo "$rootPass" | sudo -S kubectl apply -f "$yamlFile"
+                echo "$rootPass" | sudo -S kubectl get all
+                '''
+            }
+        }
+
+    }
+}
