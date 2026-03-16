@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script{
                         def currentdir=sh(script: "pwd", returnStdout: true).trim()
-                        echo "${dir}"
+                        echo "${currentdir}"
                         def last=sh(script: 'pwd | rev | cut -d "/" -f1 | rev', returnStdout: true).trim()
                         echo "${last}"
                         def list=sh(script: "ls -lrt | awk -F\" \" '{print \$NF}'", returnStdout: true).trim()
