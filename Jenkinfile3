@@ -15,8 +15,8 @@ pipeline {
         stage("Terraform Ops") {
             steps {
                 script{
-                        def currentdir=sh(script: "pwd", returnStdout: true).trim()
-                        echo "${currentdir}"
+                        def dir=sh(script: "pwd", returnStdout: true).trim()
+                        echo "${dir}"
                         def last=sh(script: 'pwd | rev | cut -d "/" -f1 | rev', returnStdout: true).trim()
                         echo "${last}"
                         def list=sh(script: "ls -lrt | awk -F\" \" '{print \$NF}'", returnStdout: true).trim()
@@ -44,18 +44,43 @@ pipeline {
                           fi
                         """
 
-                        dir("${env.WORKSPACE}/${params.directory}"){ 
+                 dir("${env.WORKSPACE}/${params.directory}"){ 
                    sh ''' terraform init 
                         ls -lrt
                         pwd
                         terraform plan ''' 
-                   input "want to apply" 
-                   sh 'terraform apply -auto-approve' 
+                   
                 }
                     }
                 
             }
         }
+        stage("Approval") {
+    steps {
+        input "Want to apply?"
+    }
+}
+
+stage("Terraform Apply") {
+    steps {
+        dir("${env.WORKSPACE}/${params.directory}"){
+        sh 'terraform apply -auto-approve'}
+    }
+}
+
+stage("Wait") {
+    steps {
+        sleep time: 300, unit: 'SECONDS'
+    }
+}
+
+stage("Terraform Destroy") {
+    steps {
+        dir("${env.WORKSPACE}/${params.directory}"){
+        sh 'terraform destroy -auto-approve'}
+    }
+}
+
 
     }
 }
