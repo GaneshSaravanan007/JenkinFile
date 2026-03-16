@@ -13,14 +13,12 @@ pipeline {
 
         stage("Terraform Ops") {
             steps {
-                sh '''
-                    terraform init
-                    terraform plan
-                '''
-
-                input "Want to apply?"
-
-                sh "terraform apply -auto-approve"
+                dir(env.WORKSPACE){ 
+                   sh ''' terraform init && \
+                        terraform plan ''' 
+                   input "want to apply" 
+                   sh 'terraform apply -auto-approve' 
+                }
             }
         }
 
