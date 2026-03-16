@@ -8,17 +8,52 @@ pipeline {
                 git url: "https://github.com/GaneshSaravanan007/AWSTerraform.git",
                     credentialsId: "gitPass",
                     branch: "${params.branch}"
+                    sh 'pwd'
             }
         }
 
         stage("Terraform Ops") {
             steps {
-                dir(env.WORKSPACE){ 
-                   sh ''' terraform init && \
+                script{
+                        def dir=sh(script: "pwd", returnStdout: true).trim()
+                        echo "${dir}"
+                        def last=sh(script: 'pwd | rev | cut -d "/" -f1 | rev', returnStdout: true).trim()
+                        echo "${last}"
+                        def list=sh(script: "ls -lrt | awk -F\" \" '{print \$NF}'", returnStdout: true).trim()
+                        echo "${list}"
+                    
+                          sh """
+                            for i in \$(ls); do
+                                 if [ "\$i" == "${params.directory}" ]; then
+                                   if [ -e "\$i" ]; then
+                                        echo "\$i exists in current directory, proceeding..."
+                                   else
+                                    echo "\$i not found in current directory"
+                                    exit 1
+                                   fi
+                                  fi
+                            done
+                           """
+                        
+                        sh """
+                          if [ -d "${params.directory}" ]; then
+                            echo "${params.directory} exists, proceeding further"
+                          else
+                             echo "Directory does not exist"
+                             exit 1
+                          fi
+                        """
+
+                        dir("${env.WORKSPACE}/${params.directory}"){ 
+                   sh ''' terraform init 
+                        ls -lrt
+                        pwd
                         terraform plan ''' 
                    input "want to apply" 
                    sh 'terraform apply -auto-approve' 
                 }
+                    }
+                
             }
         }
 
