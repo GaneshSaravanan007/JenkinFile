@@ -1,23 +1,28 @@
-pipeline{
-agent any
-stages{  
-stage("checkout"){
-  steps{
-    git url: "https://github.com/GaneshSaravanan007/AWSTerraform.git", credentialsId: "gitPass", branch: "${params.branch}"
-  }
-}
-stage("terraform ops"){
- steps{
-   dir(env.WORKSPACE){
-      sh '''
-         terraform init && \
-                terraform plan
-         '''
-        input "want to apply"
-      sh 'terraform apply -auto-approve'
+pipeline {
+    agent any
+
+    stages {  
+
+        stage("Checkout") {
+            steps {
+                git url: "https://github.com/GaneshSaravanan007/AWSTerraform.git",
+                    credentialsId: "gitPass",
+                    branch: "${params.branch}"
+            }
         }
-   }
- }
-}
-}
+
+        stage("Terraform Ops") {
+            steps {
+                sh '''
+                    terraform init
+                    terraform plan
+                '''
+
+                input "Want to apply?"
+
+                sh "terraform apply -auto-approve"
+            }
+        }
+
+    }
 }
