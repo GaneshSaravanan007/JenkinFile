@@ -15,7 +15,7 @@ pipeline {
         stage("Terraform Ops") {
             steps {
                 script{
-                        def dir=sh(script: "pwd", returnStdout: true).trim()
+                        def currentdir=sh(script: "pwd", returnStdout: true).trim()
                         echo "${dir}"
                         def last=sh(script: 'pwd | rev | cut -d "/" -f1 | rev', returnStdout: true).trim()
                         echo "${last}"
